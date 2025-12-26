@@ -24,35 +24,31 @@
 
         .container { max-width: 1100px; margin: 0 auto; }
 
-        /* Фильтры */
         .controls { background: white; padding: 20px; border-radius: 24px; box-shadow: var(--card-shadow); margin-bottom: 30px; }
         .filter-group { margin-bottom: 20px; }
         .filter-group h4 { margin: 0 0 10px 0; font-size: 11px; font-weight: 700; color: var(--text-gray); text-transform: uppercase; }
         
-        .chips { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding-bottom: 5px; -webkit-overflow-scrolling: touch; }
+        .chips { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
         .chips::-webkit-scrollbar { display: none; }
-        @media (min-width: 768px) { .chips { flex-wrap: wrap; overflow-x: visible; } }
+        @media (min-width: 768px) { .chips { flex-wrap: wrap; } }
 
         .chip { flex: 0 0 auto; padding: 10px 18px; border: 1px solid #eee; background: white; border-radius: 12px; cursor: pointer; font-size: 13px; font-family: 'Montserrat'; transition: 0.2s; }
         .chip.active { background: #121212; color: white; border-color: #121212; font-weight: 700; }
 
-        /* Сетка товаров */
         #products { display: grid; grid-template-columns: 1fr; gap: 20px; }
         @media (min-width: 600px) { #products { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 900px) { #products { grid-template-columns: repeat(3, 1fr); } }
 
-        .card { background: white; border-radius: 24px; padding: 20px; box-shadow: var(--card-shadow); display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s; border: 1px solid rgba(0,0,0,0.03); }
+        .card { background: white; border-radius: 24px; padding: 20px; box-shadow: var(--card-shadow); display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s; border: 1px solid #f0f0f0; }
         .card:active { transform: scale(0.98); }
         .card img { width: 100%; height: 180px; object-fit: contain; margin-bottom: 15px; pointer-events: none; }
-        .card h3 { margin: 0 0 10px; font-size: 17px; min-height: 48px; font-weight: 700; line-height: 1.3; }
+        .card h3 { margin: 0 0 10px; font-size: 17px; min-height: 48px; font-weight: 700; }
         .price { font-size: 24px; font-weight: 900; margin: 10px 0; }
 
-        /* Управление */
         .qty-controls { display: flex; align-items: center; justify-content: space-between; background: #f5f5f5; border-radius: 14px; padding: 5px; margin-top: auto; cursor: default; }
-        .qty-btn { width: 40px; height: 40px; border: none; background: white; border-radius: 10px; font-size: 20px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .qty-btn { width: 40px; height: 40px; border: none; background: white; border-radius: 10px; font-size: 20px; font-weight: 700; cursor: pointer; }
         .add-to-cart-btn { width: 100%; padding: 15px; border: none; background: #121212; color: white; border-radius: 14px; font-weight: 700; cursor: pointer; margin-top: 10px; font-family: 'Montserrat'; }
 
-        /* Модалки */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 3000; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: sticky; top: 0; background: white; z-index: 10; padding: 10px 0; }
         
@@ -61,13 +57,12 @@
         .spec-label { color: var(--text-gray); }
         .spec-value { font-weight: 700; }
 
-        /* Корзина */
-        .cart-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 500px; background: #121212; color: white; padding: 15px 25px; border-radius: 20px; display: none; justify-content: space-between; align-items: center; z-index: 2000; box-shadow: 0 15px 30px rgba(0,0,0,0.3); cursor: pointer; }
+        .cart-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 500px; background: #121212; color: white; padding: 15px 25px; border-radius: 20px; display: none; justify-content: space-between; align-items: center; z-index: 2000; box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
         .cart-bar.active { display: flex; }
         .cart-item { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; gap: 10px; }
-        .cart-item-img { width: 55px; height: 55px; object-fit: contain; background: #f9f9f9; border-radius: 10px; }
+        .cart-item-img { width: 50px; height: 50px; object-fit: contain; }
         
-        .reset-btn { width: 100%; padding: 12px; border: none; background: #fff1f0; border-radius: 12px; color: #f5222d; font-weight: 700; cursor: pointer; margin-top: 10px; font-family: 'Montserrat'; font-size: 12px; }
+        .reset-btn { width: 100%; padding: 12px; border: none; background: #fff1f0; border-radius: 12px; color: #f5222d; font-weight: 700; margin-top: 10px; font-family: 'Montserrat'; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -79,30 +74,30 @@
         <div class="filter-group">
             <h4>Тип шины</h4>
             <div id="typeChips" class="chips">
-                <button class="chip active" data-all="true">Все</button>
-                <button class="chip" data-val="ШИПЫ">Шипы</button>
-                <button class="chip" data-val="ЛИПУЧКИ">Липучки</button>
-                <button class="chip" data-val="ПОДШИП">Подшип</button>
-                <button class="chip" data-val="ЛЕТНИЕ">Летние</button>
+                <button class="chip active" data-all="true" onclick="resetGroup('тип', this.parentElement)">Все</button>
+                <button class="chip" data-val="ШИПЫ" onclick="toggleFilter('тип', 'ШИПЫ', this, this.parentElement)">Шипы</button>
+                <button class="chip" data-val="ЛИПУЧКИ" onclick="toggleFilter('тип', 'ЛИПУЧКИ', this, this.parentElement)">Липучки</button>
+                <button class="chip" data-val="ПОДШИП" onclick="toggleFilter('тип', 'ПОДШИП', this, this.parentElement)">Подшип</button>
+                <button class="chip" data-val="ЛЕТНИЕ" onclick="toggleFilter('тип', 'ЛЕТНИЕ', this, this.parentElement)">Летние</button>
             </div>
         </div>
         <div class="filter-group"><h4>Ширина</h4><div id="widthChips" class="chips"></div></div>
         <div class="filter-group"><h4>Высота</h4><div id="heightChips" class="chips"></div></div>
         <div class="filter-group"><h4>Диаметр</h4><div id="diamChips" class="chips"></div></div>
-        <button class="reset-btn" onclick="resetFilters()">СБРОСИТЬ ВСЁ ФИЛЬТРЫ</button>
+        <button class="reset-btn" onclick="resetFilters()">СБРОСИТЬ ВСЕ ФИЛЬТРЫ</button>
     </div>
     <div id="products">Загрузка товаров...</div>
 </div>
 
 <div id="cartBar" class="cart-bar" onclick="showCartDetails()">
     <div><span id="cartCount">0</span> товаров • <strong id="cartTotalSum">0</strong> ₸</div>
-    <button style="background:var(--accent); color:white; border:none; padding:10px 15px; border-radius:12px; font-weight:700; font-family:'Montserrat';">КОРЗИНА</button>
+    <button style="background:var(--accent); color:white; border:none; padding:10px; border-radius:10px; font-weight:700;">КОРЗИНА</button>
 </div>
 
 <div id="productModal" class="modal">
     <div class="modal-header">
         <button onclick="closeModal('productModal')" style="border:none; background:none; font-size:30px; cursor:pointer;">&larr;</button>
-        <h3 id="modalTitle" style="margin:0; font-size:18px; font-weight:900;">Детали</h3>
+        <h3 id="modalTitle" style="margin:0;">Детали</h3>
         <div style="width:30px;"></div>
     </div>
     <div id="productDetailContent"></div>
@@ -110,16 +105,15 @@
 
 <div id="cartModal" class="modal">
     <div class="modal-header">
-        <h2 style="margin:0; font-weight:900;">Ваш заказ</h2>
-        <span style="font-size:35px; cursor:pointer; line-height:1;" onclick="closeModal('cartModal')">&times;</span>
+        <h2 style="margin:0;">Заказ</h2>
+        <span style="font-size:35px; cursor:pointer;" onclick="closeModal('cartModal')">&times;</span>
     </div>
-    <div id="cartItemsList" style="flex-grow:1; overflow-y:auto;"></div>
+    <div id="cartItemsList" style="flex-grow:1;"></div>
     <div style="padding-top:20px; border-top:1px solid #eee;">
-        <div style="display:flex; justify-content:space-between; font-size:22px; font-weight:900; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; font-size:20px; font-weight:900; margin-bottom:20px;">
             <span>Итого:</span><span id="finalSum">0 ₸</span>
         </div>
         <button class="add-to-cart-btn" style="background:#25d366;" onclick="sendOrder()">ЗАКАЗАТЬ WHATSAPP</button>
-        <button class="add-to-cart-btn" style="background:var(--kaspi); margin-top:10px;" onclick="sendKaspi()">ОПЛАТИТЬ KASPI PAY</button>
     </div>
 </div>
 
@@ -127,7 +121,6 @@
 <script>
 const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRMe3Xbtzrt3WmiYKEOCv5WI_i4_cuR9AX1WxJrNKIHDXya8D1nwSq-YWhXz8wyS1BYWEN1g-bS5-y5/pub?output=csv";
 const WA_PHONE = "77010708660";
-const kaspiLink = "https://pay.kaspi.kz/pay/oyxapf6c";
 
 let db = [], f = { тип: [], ширина: [], высота: [], диаметр: [] }, cart = {}; 
 
@@ -139,35 +132,21 @@ Papa.parse(csvUrl, {
             for (let k in r) { row[k.trim().toLowerCase()] = r[k] ? r[k].toString().trim() : ""; }
             return row;
         });
-        initFilters(); render();
+        initDynamicFilters(); 
+        render();
     }
 });
 
-function initFilters() {
-    ['тип', 'ширина', 'высота', 'диаметр'].forEach(key => {
-        const boxId = (key === 'тип' ? 'typeChips' : key + 'Chips');
-        const box = document.getElementById(boxId);
-        if (!box) return;
-
-        if (key !== 'тип') {
-            const vals = [...new Set(db.map(p => p[key]))].filter(v => v).sort((a,b) => parseFloat(a)-parseFloat(b));
-            box.innerHTML = `<button class="chip active" data-all="true" onclick="resetGroup('${key}', this.parentElement)">Все</button>`;
-            vals.forEach(v => {
-                const b = document.createElement('button');
-                b.className = 'chip';
-                b.textContent = v;
-                b.onclick = (e) => { e.stopPropagation(); toggleFilter(key, v, b, box); };
-                box.appendChild(b);
-            });
-        } else {
-            box.querySelectorAll('.chip').forEach(b => {
-                b.onclick = (e) => {
-                    e.stopPropagation();
-                    if (b.dataset.all) resetGroup(key, box);
-                    else toggleFilter(key, b.dataset.val, b, box);
-                };
-            });
-        }
+function initDynamicFilters() {
+    ['ширина', 'высота', 'диаметр'].forEach(key => {
+        const box = document.getElementById(key + 'Chips');
+        const vals = [...new Set(db.map(p => p[key]))].filter(v => v).sort((a,b) => parseFloat(a)-parseFloat(b));
+        
+        let html = `<button class="chip active" data-all="true" onclick="resetGroup('${key}', this.parentElement)">Все</button>`;
+        vals.forEach(v => {
+            html += `<button class="chip" onclick="toggleFilter('${key}', '${v}', this, this.parentElement)">${v}</button>`;
+        });
+        box.innerHTML = html;
     });
 }
 
@@ -180,7 +159,10 @@ function toggleFilter(key, val, btn, box) {
         f[key].push(val);
         btn.classList.add('active');
     }
-    f[key].length === 0 ? allBtn.classList.add('active') : allBtn.classList.remove('active');
+    
+    if (f[key].length === 0) allBtn.classList.add('active');
+    else allBtn.classList.remove('active');
+    
     render();
 }
 
@@ -191,6 +173,37 @@ function resetGroup(key, box) {
     render();
 }
 
+function render() {
+    const list = document.getElementById("products");
+    let data = db.filter(p => {
+        return (f.тип.length === 0 || f.тип.includes(p.тип.toUpperCase())) &&
+               (f.ширина.length === 0 || f.ширина.includes(p.ширина)) &&
+               (f.высота.length === 0 || f.высота.includes(p.высота)) &&
+               (f.диаметр.length === 0 || f.диаметр.includes(p.диаметр));
+    });
+
+    list.innerHTML = data.length ? "" : "<p style='grid-column:1/-1; text-align:center; padding:50px;'>Ничего не найдено</p>";
+    
+    data.forEach(p => {
+        const q = cart[p.id] || 0;
+        const c = document.createElement("div");
+        c.className = "card";
+        c.onclick = () => openProductDetail(p.id);
+        c.innerHTML = `
+            <img src="${p['фото 1'] || 'https://via.placeholder.com/250'}">
+            <h3>${p.бренд} ${p.размер}</h3>
+            <div class="price">${parseInt(p.цена.replace(/\s/g, '')).toLocaleString()} ₸</div>
+            <div class="qty-controls" onclick="event.stopPropagation()">
+                <button class="qty-btn" onclick="updateCart(${p.id}, -2)">-</button>
+                <div style="font-weight:900;">${q} шт</div>
+                <button class="qty-btn" onclick="updateCart(${p.id}, 2)">+</button>
+            </div>
+            ${q === 0 ? `<button class="add-to-cart-btn" onclick="updateCart(${p.id}, 2, event)">ВЫБРАТЬ</button>` : ''}
+        `;
+        list.appendChild(c);
+    });
+}
+
 function updateCart(id, delta, e) {
     if(e) e.stopPropagation();
     cart[id] = (cart[id] || 0) + delta;
@@ -198,7 +211,6 @@ function updateCart(id, delta, e) {
     if (cart[id] > 0 && cart[id] < 2) cart[id] = delta > 0 ? 2 : 0;
     render(); 
     updateCartBar();
-    if (document.getElementById('cartModal').style.display === 'flex') showCartDetails();
 }
 
 function updateCartBar() {
@@ -215,70 +227,29 @@ function updateCartBar() {
         bar.classList.add('active');
         document.getElementById('cartCount').textContent = count;
         document.getElementById('cartTotalSum').textContent = sum.toLocaleString();
-    } else { 
-        bar.classList.remove('active'); 
-        closeModal('cartModal');
-    }
-}
-
-function render() {
-    const list = document.getElementById("products");
-    let data = db.filter(p => 
-        (f.тип.length === 0 || f.тип.includes(p.тип.toUpperCase())) &&
-        (f.ширина.length === 0 || f.ширина.includes(p.ширина)) &&
-        (f.высота.length === 0 || f.высота.includes(p.высота)) &&
-        (f.диаметр.length === 0 || f.диаметр.includes(p.диаметр))
-    );
-    list.innerHTML = data.length ? "" : "<p style='grid-column:1/-1; text-align:center; padding:50px;'>Ничего не найдено</p>";
-    data.forEach(p => {
-        const q = cart[p.id] || 0;
-        const c = document.createElement("div");
-        c.className = "card";
-        c.onclick = () => openProductDetail(p.id);
-        c.innerHTML = `
-            <img src="${p['фото 1'] || 'https://via.placeholder.com/250'}">
-            <h3>${p.бренд} ${p.размер}</h3>
-            <div class="price">${parseInt(p.цена.replace(/\s/g, '')).toLocaleString()} ₸</div>
-            <div class="qty-controls" onclick="event.stopPropagation()">
-                <button class="qty-btn" onclick="updateCart(${p.id}, -2)">-</button>
-                <div style="font-weight:900; font-size:16px;">${q} шт</div>
-                <button class="qty-btn" onclick="updateCart(${p.id}, 2)">+</button>
-            </div>
-            ${q === 0 ? `<button class="add-to-cart-btn" onclick="updateCart(${p.id}, 2, event)">ВЫБРАТЬ</button>` : ''}
-        `;
-        list.appendChild(c);
-    });
+    } else { bar.classList.remove('active'); }
 }
 
 function openProductDetail(id) {
     const p = db.find(item => item.id == id);
     document.getElementById('modalTitle').textContent = p.бренд;
     document.getElementById('productDetailContent').innerHTML = `
-        <div style="padding-bottom:120px;">
-            <img src="${p['фото 1'] || 'https://via.placeholder.com/400'}" class="product-detail-img">
-            <h2 style="margin:0 0 10px; font-weight:900;">${p.бренд} ${p.размер}</h2>
-            <div style="font-size:28px; font-weight:900; color:var(--accent); margin-bottom:20px;">${parseInt(p.цена.replace(/\s/g, '')).toLocaleString()} ₸</div>
-            
-            <div style="margin-bottom:20px;">
-                <h4 style="text-transform:uppercase; font-size:12px; color:gray;">Характеристики</h4>
-                <div class="spec-row"><span class="spec-label">Ширина</span><span class="spec-value">${p.ширина}</span></div>
-                <div class="spec-row"><span class="spec-label">Высота</span><span class="spec-value">${p.высота}</span></div>
-                <div class="spec-row"><span class="spec-label">Диаметр</span><span class="spec-value">${p.диаметр}</span></div>
-                <div class="spec-row"><span class="spec-label">Тип</span><span class="spec-value">${p.тип}</span></div>
-            </div>
-            
-            <div style="background:#f9f9f9; padding:20px; border-radius:20px; line-height:1.6; font-size:15px;">
-                <strong style="display:block; margin-bottom:5px;">Описание:</strong>
-                ${p.описание || 'Высококачественные шины, обеспечивающие надежное сцепление с дорогой и комфортную езду в любых условиях.'}
-            </div>
+        <img src="${p['фото 1'] || 'https://via.placeholder.com/400'}" class="product-detail-img">
+        <h2 style="margin:0 0 10px;">${p.бренд} ${p.размер}</h2>
+        <div style="font-size:24px; font-weight:900; color:var(--accent); margin-bottom:20px;">${parseInt(p.цена.replace(/\s/g, '')).toLocaleString()} ₸</div>
+        <div style="margin-bottom:20px;">
+            <div class="spec-row"><span class="spec-label">Ширина</span><span class="spec-value">${p.ширина}</span></div>
+            <div class="spec-row"><span class="spec-label">Высота</span><span class="spec-value">${p.высота}</span></div>
+            <div class="spec-row"><span class="spec-label">Диаметр</span><span class="spec-value">${p.диаметр}</span></div>
         </div>
-
-        <div style="position:fixed; bottom:0; left:0; width:100%; padding:20px; background:white; border-top:1px solid #eee; z-index:100;">
-            <button class="add-to-cart-btn" style="margin:0;" onclick="updateCart(${p.id}, 2); closeModal('productModal')">ДОБАВИТЬ В КОРЗИНУ (2 шт)</button>
+        <div style="background:#f9f9f9; padding:15px; border-radius:15px; font-size:14px; margin-bottom:100px;">
+            <strong>Описание:</strong><br>${p.описание || 'Премиальные шины для вашего комфорта.'}
+        </div>
+        <div style="position:fixed; bottom:0; left:0; width:100%; padding:20px; background:white; border-top:1px solid #eee;">
+            <button class="add-to-cart-btn" onclick="updateCart(${p.id}, 2); closeModal('productModal')">ДОБАВИТЬ В КОРЗИНУ</button>
         </div>
     `;
     document.getElementById('productModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
 }
 
 function showCartDetails() {
@@ -288,51 +259,31 @@ function showCartDetails() {
         const p = db.find(item => item.id == id);
         const sum = cart[id] * parseInt(p.цена.replace(/\s/g, ''));
         total += sum;
-        list.innerHTML += `
-            <div class="cart-item">
-                <img src="${p['фото 1'] || ''}" class="cart-item-img">
-                <div style="flex-grow:1">
-                    <div style="font-weight:700; font-size:14px;">${p.бренд}</div>
-                    <div style="font-size:12px; color:gray; margin-bottom:5px;">${p.размер}</div>
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <button class="qty-btn" style="width:30px; height:30px; font-size:16px;" onclick="updateCart(${p.id}, -2)">-</button>
-                        <span style="font-weight:900;">${cart[id]}</span>
-                        <button class="qty-btn" style="width:30px; height:30px; font-size:16px;" onclick="updateCart(${p.id}, 2)">+</button>
-                    </div>
-                </div>
-                <div style="font-weight:900; font-size:15px;">${sum.toLocaleString()} ₸</div>
-            </div>`;
+        list.innerHTML += `<div class="cart-item">
+            <div style="flex-grow:1"><strong>${p.бренд}</strong><br><small>${p.размер}</small></div>
+            <div>${cart[id]} шт - ${sum.toLocaleString()} ₸</div>
+        </div>`;
     }
     document.getElementById('finalSum').textContent = total.toLocaleString() + " ₸";
     document.getElementById('cartModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
 }
 
-function closeModal(m) { document.getElementById(m).style.display = 'none'; document.body.style.overflow = 'auto'; }
-
-function sendOrder() {
-    let t = "Здравствуйте! Заказ в SHINMART:\n\n";
-    let total = 0;
-    for(let id in cart) if(cart[id]>0) {
-        const p = db.find(i=>i.id==id);
-        const s = cart[id] * parseInt(p.цена.replace(/\s/g, ''));
-        t += `• ${p.бренд} (${p.размер}) — ${cart[id]} шт.\nСумма: ${s.toLocaleString()} ₸\n\n`;
-        total += s;
-    }
-    t += `ИТОГО К ОПЛАТЕ: ${total.toLocaleString()} ₸`;
-    window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(t)}`);
-}
-
-function sendKaspi() { window.open(kaspiLink); }
+function closeModal(m) { document.getElementById(m).style.display = 'none'; }
 
 function resetFilters() {
     f = { тип: [], ширина: [], высота: [], диаметр: [] };
     document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.chips').forEach(box => {
-        const allBtn = box.querySelector('[data-all="true"]');
-        if (allBtn) allBtn.classList.add('active');
-    });
+    document.querySelectorAll('[data-all="true"]').forEach(b => b.classList.add('active'));
     render();
+}
+
+function sendOrder() {
+    let t = "Заказ SHINMART:\n";
+    for(let id in cart) if(cart[id]>0) {
+        const p = db.find(i=>i.id==id);
+        t += `${p.бренд} ${p.размер} - ${cart[id]} шт.\n`;
+    }
+    window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(t)}`);
 }
 </script>
 </body>
