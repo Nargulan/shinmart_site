@@ -3,45 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Тест каталога</title>
+<title>Каталог шин</title>
 
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <style>
-body { font-family: Arial; padding: 20px }
-.card { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px }
-img { max-width: 200px }
+body { font-family: Arial; background:#f7f7f7; padding:20px }
+.filters { display:grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap:10px; margin-bottom:20px }
+select,input { padding:8px }
+.card {
+  background:#fff; border-radius:8px; padding:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  display:grid; grid-template-columns:150px 1fr; gap:15px
+}
+.card img { max-width:150px }
+.price { font-size:20px; font-weight:bold }
+.out { display:grid; gap:15px }
+.badge { display:inline-block; padding:3px 8px; background:#eee; border-radius:5px; font-size:12px }
+.switch { margin-bottom:15px }
 </style>
 </head>
 <body>
 
-<h2>Тест загрузки Google Таблицы</h2>
-<div id="out">Загрузка...</div>
+<h2>Каталог шин</h2>
+
+<div class="switch">
+  <label>
+    <input type="radio" name="priceType" value="РОЗНИЦА" checked> Розница
+  </label>
+  <label style="margin-left:15px">
+    <input type="radio" name="priceType" value="ОПТ"> Опт
+  </label>
+</div>
+
+<div class="filters">
+  <select id="size"><option value="">Размер</option></select>
+  <select id="season"><option value="">Сезон</option></select>
+  <select id="studs"><option value="">Шипы</option></select>
+  <select id="brand"><option value="">Бренд</option></select>
+  <input id="search" placeholder="Поиск по названию">
+  <label><input type="checkbox" id="instock"> В наличии</label>
+</div>
+
+<div id="out" class="out">Загрузка...</div>
 
 <script>
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRllTq080YSSI7EgOmGa0XqlhLPxKpomN26jhacDriuVsYPMdJhLM1blqR5Z5FiBvUOjHrdQujXS67q/pub?output=csv";
 
-Papa.parse(CSV_URL, {
-  download: true,
-  header: true,
-  complete: function(res) {
-    const out = document.getElementById("out");
-    out.innerHTML = "";
+let data = [];
+let priceType = "РОЗНИЦА";
 
-    res.data.slice(0,5).forEach(r => {
-      out.innerHTML += `
-        <div class="card">
-          <div><b>${r["Наименование"]}</b></div>
-          <div>Цена: ${r["РОЗНИЦА"]}</div>
-          <img src="${r["Фото"]}">
-        </div>
-      `;
-    });
-  },
-  error: function(err) {
-    document.getElementById("out").innerText = "ОШИБКА: " + err;
+Papa.parse(CSV_URL, {
+  download:true,
+  header:true,
+  complete: res => {
+    data = res.data.filter(r => r["Наименование"]);
+    fillFilters();
+    render();
   }
 });
+
+document.querySelectorAll("input,select").forEach(el =>
+  el.addEventListener("input", render)
+);
+
+document.querySelectorAll("input[name='priceType']").forEach(r =>
+  r.addEventListener("change", e => {
+    priceType = e.target.value;
+    render();
+  })
+);
+
+function fillFilters() {
+  fill("size","Размер");
+  fill("season","Сезон");
+  fill("studs","Шипы");
+  fill("brand","Бренд");
+}
+
+function fill(id,key) {
+  const s = document.getElementById(id);
+  [...new Set(data.map(r=>r[key]).filter(Boolean))]
+    .sort()
+    .forEach(v => s.innerHTML += `<option>${v}</option>`);
+}
+
+function render() {
+  const out = document.getElementById("out");
+  out.innerHTML = "";
+
+  const f = {
+    size:size.value,
+    season:season.value,
+    studs:studs.value,
+    brand:brand.value,
+    search:search.value.toLowerCase(),
+    instock:instock.checked
+  };
+
+  data.filter(r =>
+    (!f.size || r["Размер"]===f.size) &&
+    (!f.season || r["Сезон"]===f.season) &&
+    (!f.studs || r["Шипы"]===f.studs) &&
+    (!f.brand || r["Бренд"]===f.brand) &&
+    (!f.search || r["Наименование"].toLowerCase().includes(f.search)) &&
+    (!f.instock || Number(r["Остаток"])>0)
+  ).forEach(r=>{
+    out.innerHTML += `
+      <div class="card">
+        <img src="${r["Фото"]}">
+        <div>
+          <div><b>${r["Наименование"]}</b></div>
+          <div class="price">${r[priceType]} ₸</div>
+          <div class="badge">Остаток: ${r["Остаток"]}</div>
+          <div class="badge">${r["Сезон"]}</div>
+          <div class="badge">Шипы: ${r["Шипы"]}</div>
+          <div class="badge">${r["Бренд"]}</div>
+        </div>
+      </div>`;
+  });
+
+  if (!out.innerHTML) out.innerHTML = "Ничего не найдено";
+}
 </script>
 
 </body>
