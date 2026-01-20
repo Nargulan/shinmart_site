@@ -7,53 +7,95 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+        .filter-chip { @apply px-3 py-1 rounded-full border text-xs font-medium transition-all cursor-pointer; }
+        .filter-active { @apply bg-blue-600 border-blue-600 text-white shadow-md; }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
 
-<div x-data="tireCatalog()" x-init="init()" class="max-w-4xl mx-auto p-4">
+<div x-data="tireCatalog()" x-init="init()" x-cloak class="max-w-4xl mx-auto p-4 pb-20">
     <header class="text-center py-6">
-        <h1 class="text-3xl font-extrabold text-blue-800">БАЗА ШИН</h1>
-        <p class="text-gray-500 mt-2">Актуальное наличие и цены</p>
+        <h1 class="text-3xl font-black text-blue-900 tracking-tight">БАЗА ШИН</h1>
+        <p class="text-gray-500 text-sm mt-1">Автоматическое обновление из Google Таблиц</p>
     </header>
 
-    <div class="sticky top-0 bg-gray-50 py-4 z-10">
-        <input type="text" x-model="search" placeholder="Поиск (размер, бренд, название)..." 
-               class="w-full p-4 rounded-xl border-2 border-blue-100 shadow-lg focus:border-blue-500 outline-none transition-all">
+    <div class="space-y-4 mb-6">
+        <input type="text" x-model="search" placeholder="Поиск по названию..." 
+               class="w-full p-4 rounded-2xl border-none shadow-lg focus:ring-2 focus:ring-blue-500 outline-none">
+
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+            <div>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Сезон</span>
+                <div class="flex flex-wrap gap-2">
+                    <template x-for="s in ['Все', ...options.seasons]">
+                        <div @click="filters.season = s" :class="filters.season === s ? 'filter-active' : 'bg-gray-50'" class="filter-chip" x-text="s"></div>
+                    </template>
+                </div>
+            </div>
+
+            <div>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Шипы</span>
+                <div class="flex flex-wrap gap-2">
+                    <template x-for="s in ['Все', ...options.spikes]">
+                        <div @click="filters.spike = s" :class="filters.spike === s ? 'filter-active' : 'bg-gray-50'" class="filter-chip" x-text="s === 'Да' ? 'Шипованные' : (s === 'Нет' ? 'Без шипов' : 'Все')"></div>
+                    </template>
+                </div>
+            </div>
+
+            <div>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Размер</span>
+                <select x-model="filters.size" class="w-full p-2 bg-gray-50 rounded-lg border-none text-sm outline-none">
+                    <option value="Все">Все размеры</option>
+                    <template x-for="size in options.sizes">
+                        <option :value="size" x-text="size"></option>
+                    </template>
+                </select>
+            </div>
+
+            <div>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Бренд</span>
+                <div class="flex flex-wrap gap-2">
+                    <template x-for="b in ['Все', ...options.brands]">
+                        <div @click="filters.brand = b" :class="filters.brand === b ? 'filter-active' : 'bg-gray-50'" class="filter-chip" x-text="b"></div>
+                    </template>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div x-show="loading" class="text-center py-20 text-xl font-medium">Загрузка каталога...</div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+    <div x-show="!loading" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <template x-for="tire in filteredTires()" :key="tire.id">
-            <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow border border-gray-100 overflow-hidden flex flex-col">
-                <div class="h-48 bg-white flex items-center justify-center p-4">
-                    <img :src="tire.photo || 'https://via.placeholder.com/200?text=No+Photo'" 
-                         class="h-full object-contain" alt="tire">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col relative">
+                <template x-if="tire.spike === 'Да'">
+                    <span class="absolute top-2 right-2 bg-orange-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">ШИПЫ</span>
+                </template>
+
+                <div class="flex items-center mb-4">
+                    <img :src="tire.photo || 'https://via.placeholder.com/100?text=No+Photo'" class="w-20 h-20 object-contain mr-4">
+                    <div>
+                        <div class="text-[10px] font-bold text-blue-600 uppercase" x-text="tire.brand"></div>
+                        <h3 class="font-bold text-sm leading-tight" x-text="tire.name"></h3>
+                        <div class="text-xs text-gray-500 mt-1" x-text="tire.size"></div>
+                    </div>
                 </div>
                 
-                <div class="p-5 flex-1 flex flex-col">
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="px-2 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase rounded" x-text="tire.brand"></span>
-                        <span class="text-xs font-semibold" :class="tire.stock.includes('больше') ? 'text-green-600' : 'text-orange-500'" x-text="tire.stock"></span>
+                <div class="mt-auto pt-3 border-t border-gray-50 flex justify-between items-center">
+                    <div>
+                        <div class="text-lg font-black text-gray-900" x-text="tire.price + ' ₸'"></div>
+                        <div class="text-[10px]" :class="tire.stock.includes('больше') ? 'text-green-600' : 'text-orange-500'" x-text="'Склад: ' + tire.stock"></div>
                     </div>
-                    
-                    <h3 class="font-bold text-lg leading-tight mb-2" x-text="tire.name"></h3>
-                    
-                    <div class="text-sm text-gray-600 mb-4">
-                        Размер: <span class="font-bold text-gray-800" x-text="tire.size"></span><br>
-                        Тип: <span x-text="tire.type"></span>
-                    </div>
-
-                    <div class="mt-auto flex justify-between items-center pt-4 border-t border-gray-50">
-                        <div class="text-2xl font-black text-blue-900"><span x-text="tire.price"></span> ₸</div>
-                        <a :href="'https://wa.me/ВАШ_НОМЕР?text=Здравствуйте, интересуют шины: ' + tire.name" 
-                           class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full transition-colors">
-                           <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412 0 6.556-5.338 11.891-11.893 11.891-2.01 0-3.987-.51-5.742-1.47l-6.155 1.679zm6.216-3.758c1.616.959 3.23 1.442 4.848 1.442 5.397 0 9.789-4.392 9.789-9.789s-4.392-9.789-9.789-9.789c-5.399 0-9.791 4.392-9.791 9.791 0 1.769.469 3.5 1.357 5.011l-1.03 3.764 3.828-1.026zm9.462-6.516c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
-                        </a>
-                    </div>
+                    <a :href="'https://wa.me/77001234567?text=Интересуют шины: ' + tire.name" class="bg-green-500 text-white p-2 rounded-xl shadow-lg shadow-green-100">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412 0 6.556-5.338 11.891-11.893 11.891-2.01 0-3.987-.51-5.742-1.47l-6.155 1.679zm6.216-3.758c1.616.959 3.23 1.442 4.848 1.442 5.397 0 9.789-4.392 9.789-9.789s-4.392-9.789-9.789-9.789c-5.399 0-9.791 4.392-9.791 9.791 0 1.769.469 3.5 1.357 5.011l-1.03 3.764 3.828-1.026zm9.462-6.516c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+                    </a>
                 </div>
             </div>
         </template>
+    </div>
+
+    <div x-show="loading" class="flex justify-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
     </div>
 </div>
 
@@ -61,41 +103,56 @@
 function tireCatalog() {
     return {
         tires: [],
-        search: '',
         loading: true,
+        search: '',
+        filters: { season: 'Все', brand: 'Все', size: 'Все', spike: 'Все' },
+        options: { seasons: [], brands: [], sizes: [], spikes: [] },
         csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRllTq080YSSI7EgOmGa0XqlhLPxKpomN26jhacDriuVsYPMdJhLM1blqR5Z5FiBvUOjHrdQujXS67q/pub?output=csv',
-        
+
         init() {
             Papa.parse(this.csvUrl, {
                 download: true,
                 header: true,
                 complete: (results) => {
-                    this.tires = results.data.map((row, index) => ({
-                        id: index,
-                        name: row['Наименование'],
-                        brand: row['Бренд'],
-                        price: row['РОЗНИЦА'],
-                        size: row['Размер'],
-                        stock: row['Остаток'],
-                        photo: row['Фото'],
-                        type: row['Тип']
-                    })).filter(t => t.name); // Убираем пустые строки
+                    this.tires = results.data
+                        .filter(row => row['Наименование'])
+                        .map((row, i) => ({
+                            id: i,
+                            name: row['Наименование'],
+                            brand: row['Бренд'],
+                            price: row['РОЗНИЦА'],
+                            size: row['Размер'],
+                            stock: row['Остаток'],
+                            photo: row['Фото'],
+                            type: row['Тип'],
+                            spike: row['Шипы'] // Берем из колонки М
+                        }));
+                    
+                    // Собираем уникальные значения для фильтров автоматически
+                    this.options.seasons = [...new Set(this.tires.map(t => t.type))].sort();
+                    this.options.brands = [...new Set(this.tires.map(t => t.brand))].sort();
+                    this.options.sizes = [...new Set(this.tires.map(t => t.size))].sort();
+                    this.options.spikes = [...new Set(this.tires.map(t => t.spike))].sort();
+                    
                     this.loading = false;
                 }
             });
         },
-        
+
         filteredTires() {
-            if (!this.search) return this.tires;
-            const s = this.search.toLowerCase();
-            return this.tires.filter(t => 
-                t.name.toLowerCase().includes(s) || 
-                t.brand.toLowerCase().includes(s) || 
-                t.size.toLowerCase().includes(s)
-            );
+            return this.tires.filter(t => {
+                const matchSearch = t.name.toLowerCase().includes(this.search.toLowerCase());
+                const matchSeason = this.filters.season === 'Все' || t.type === this.filters.season;
+                const matchBrand = this.filters.brand === 'Все' || t.brand === this.filters.brand;
+                const matchSize = this.filters.size === 'Все' || t.size === this.filters.size;
+                const matchSpike = this.filters.spike === 'Все' || t.spike === this.filters.spike;
+                
+                return matchSearch && matchSeason && matchBrand && matchSize && matchSpike;
+            });
         }
     }
 }
 </script>
+
 </body>
 </html>
