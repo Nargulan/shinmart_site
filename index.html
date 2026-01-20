@@ -3,130 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>База Шин 2026</title>
+    <title>Каталог Шин</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         [x-cloak] { display: none !important; }
         input::-webkit-calendar-picker-indicator { display: none !important; }
-        
-        .filter-input {
-            transition: all 0.2s ease;
-            border: 2px solid transparent;
-        }
-        .filter-input:focus {
-            border-color: rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .tire-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        @media (min-width: 1024px) {
-            .tire-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08); }
-        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-[#F8FAFC] text-[#1E293B] antialiased">
+<body class="bg-[#F3F4F6] text-[#1F2937]">
 
-<div x-data="tireCatalog()" x-init="init()" x-cloak>
+<div x-data="tireCatalog()" x-init="init()" x-cloak class="max-w-md mx-auto min-h-screen">
     
-    <header class="bg-[#1E3A8A] pt-6 pb-8 px-4 sticky top-0 z-30 shadow-2xl">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-                
-                <div class="flex-shrink-0">
-                    <h1 class="text-white font-black italic tracking-tighter text-2xl md:text-3xl uppercase">
-                        База Шин <span class="text-blue-400">2026</span>
-                    </h1>
-                    <p class="text-blue-200 text-[10px] font-bold mt-1 uppercase tracking-[0.2em]">Профессиональный подбор</p>
-                </div>
+    <header class="bg-[#1E3A8A] pt-4 pb-3 px-4 sticky top-0 z-30 shadow-lg">
+        <h1 class="text-white text-center font-black italic tracking-tighter text-lg mb-3 uppercase">База Шин 2026</h1>
+        
+        <div class="relative mb-3">
+            <input type="text" x-model="search" placeholder="Поиск модели..." 
+                   class="w-full p-2.5 pl-4 bg-white/10 border border-white/20 rounded-full text-white text-sm placeholder:text-white/50 focus:bg-white focus:text-black outline-none transition-all">
+        </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 w-full lg:max-w-4xl">
-                    <div class="relative">
-                        <label class="block text-[11px] text-white font-black mb-1.5 ml-1 uppercase italic">Размер</label>
-                        <input x-model="filters.size" list="sizes-list" placeholder="Выбрать" 
-                               class="filter-input w-full p-3 rounded-xl bg-[#E2E8F0] text-[#1E293B] text-sm font-black outline-none">
-                    </div>
+        <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+            <div class="flex-shrink-0 w-32">
+                <input x-model="filters.size" list="sizes-list" placeholder="Размер" 
+                       class="w-full p-2 rounded-lg bg-white text-[11px] font-bold text-center outline-none border-none shadow-sm">
+                <datalist id="sizes-list">
+                    <template x-for="size in options.sizes"><option :value="size"></option></template>
+                </datalist>
+            </div>
 
-                    <div class="relative">
-                        <label class="block text-[11px] text-white font-black mb-1.5 ml-1 uppercase italic">Тип (сезон)</label>
-                        <select x-model="filters.season" class="filter-input w-full p-3 rounded-xl bg-[#3B82F6] text-white text-sm font-black outline-none appearance-none cursor-pointer">
-                            <option value="Все">Все</option>
-                            <template x-for="s in options.seasons"><option :value="s" x-text="s"></option></template>
-                        </select>
-                    </div>
+            <select x-model="filters.season" class="flex-shrink-0 w-28 p-2 rounded-lg bg-[#3B82F6] text-white text-[11px] font-bold text-center outline-none border-none shadow-sm appearance-none">
+                <option value="Все">Все сезоны</option>
+                <template x-for="s in options.seasons"><option :value="s" x-text="s"></option></template>
+            </select>
 
-                    <div class="relative">
-                        <label class="block text-[11px] text-white font-black mb-1.5 ml-1 uppercase italic">Шипы</label>
-                        <select x-model="filters.spike" class="filter-input w-full p-3 rounded-xl bg-[#2563EB] text-white text-sm font-black outline-none appearance-none cursor-pointer">
-                            <option value="Все">Все</option>
-                            <option value="Да">с шипами</option>
-                            <option value="Нет">без шипов</option>
-                        </select>
-                    </div>
+            <select x-model="filters.spike" class="flex-shrink-0 w-28 p-2 rounded-lg bg-[#2563EB] text-white text-[11px] font-bold text-center outline-none border-none shadow-sm appearance-none">
+                <option value="Все">Шипы: Все</option>
+                <option value="Да">С шипами</option>
+                <option value="Нет">Без шипов</option>
+            </select>
 
-                    <div class="relative">
-                        <label class="block text-[11px] text-white font-black mb-1.5 ml-1 uppercase italic">Бренд</label>
-                        <input x-model="filters.brand" list="brands-list" placeholder="Все" 
-                               class="filter-input w-full p-3 rounded-xl bg-[#FDE68A] text-[#92400E] text-sm font-black outline-none">
-                    </div>
-                </div>
+            <div class="flex-shrink-0 w-32">
+                <input x-model="filters.brand" list="brands-list" placeholder="Бренд" 
+                       class="w-full p-2 rounded-lg bg-[#FEF3C7] text-[#92400E] text-[11px] font-bold text-center outline-none border-none shadow-sm">
+                <datalist id="brands-list">
+                    <template x-for="b in options.brands"><option :value="b"></option></template>
+                </datalist>
             </div>
         </div>
-        
-        <datalist id="sizes-list"><template x-for="size in options.sizes"><option :value="size"></option></template></datalist>
-        <datalist id="brands-list"><template x-for="b in options.brands"><option :value="b"></option></template></datalist>
     </header>
 
-    <div class="max-w-7xl mx-auto px-4 mt-8 flex items-center justify-between">
-        <h2 class="text-xl font-black text-slate-800 uppercase italic">
-            Результаты поиска <span class="text-blue-600" x-text="'(' + filteredTires().length + ')'"></span>
-        </h2>
-        
-        <button x-show="isFiltered()" @click="resetFilters()" 
-                class="px-5 py-2 bg-red-50 text-red-600 text-[10px] font-black rounded-lg border border-red-100 hover:bg-red-600 hover:text-white transition-all">
-            СБРОСИТЬ ВСЁ ×
+    <div x-show="isFiltered()" class="px-4 pt-2">
+        <button @click="resetFilters()" class="w-full py-1.5 text-[10px] font-bold bg-white text-blue-600 rounded-lg shadow-sm">
+            Сбросить фильтры ✕
         </button>
     </div>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-6">
-        <div x-show="loading" class="flex flex-col items-center justify-center py-32">
-            <div class="w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"></div>
+    <main class="p-3">
+        <div x-show="loading" class="flex justify-center py-20">
+            <div class="animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 gap-3">
             <template x-for="tire in filteredTires()" :key="tire.id">
-                <div class="tire-card bg-white rounded-[2rem] p-5 shadow-sm border border-slate-100 flex flex-col">
-                    
-                    <div class="w-full h-52 bg-slate-50 rounded-[1.5rem] p-4 mb-4 flex items-center justify-center relative overflow-hidden">
-                        <img :src="tire.photo || 'https://via.placeholder.com/400?text=Шина'" 
-                             class="max-w-full max-h-full object-contain">
-                        <template x-if="tire.spike === 'Да'">
-                            <div class="absolute top-3 right-3 bg-orange-500 text-white text-[9px] font-black px-2 py-1 rounded-md uppercase italic shadow-md">шипы</div>
-                        </template>
+                <div class="bg-white rounded-2xl p-3 shadow-sm flex items-center border border-transparent active:scale-[0.98] transition-transform">
+                    <div class="w-20 h-20 flex-shrink-0 bg-gray-50 rounded-xl p-1 mr-3 flex items-center justify-center border border-gray-100">
+                        <img :src="tire.photo || 'https://via.placeholder.com/100?text=Шина'" class="w-full h-full object-contain">
                     </div>
 
-                    <div class="flex flex-col flex-1">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-[9px] font-black text-blue-600 uppercase" x-text="tire.brand"></span>
-                            <span class="text-[9px] font-bold text-slate-400 uppercase" x-text="tire.type"></span>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-1 mb-1">
+                            <span class="text-[9px] font-black text-blue-700 px-1.5 py-0.5 bg-blue-50 rounded uppercase" x-text="tire.brand"></span>
+                            <template x-if="tire.spike === 'Да'">
+                                <span class="text-[9px] font-black text-orange-600 px-1.5 py-0.5 bg-orange-50 rounded uppercase">Шипы</span>
+                            </template>
                         </div>
-                        <h3 class="font-black text-slate-900 text-[15px] leading-tight mb-3 line-clamp-2" x-text="tire.name"></h3>
+                        <h3 class="font-bold text-[13px] text-gray-900 leading-tight truncate" x-text="tire.name"></h3>
+                        <div class="text-[11px] text-gray-500 font-bold" x-text="tire.size"></div>
                         
-                        <div class="mb-4">
-                            <span class="bg-slate-100 text-slate-600 text-[10px] font-black px-2.5 py-1 rounded-md" x-text="tire.size"></span>
-                        </div>
-
-                        <div class="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
+                        <div class="mt-2 flex items-center justify-between">
                             <div>
-                                <div class="text-[18px] md:text-[22px] font-black text-slate-900" x-text="tire.price ? tire.price.toLocaleString('ru-RU') + ' ₸' : 'Цену уточняйте'"></div>
-                                <div class="flex items-center gap-1.5 mt-0.5">
-                                    <div class="w-2 h-2 rounded-full" :class="tire.stock.includes('больше') ? 'bg-green-500' : 'bg-orange-400'"></div>
-                                    <span class="text-[9px] font-black text-slate-400 uppercase" x-text="tire.stock"></span>
-                                </div>
+                                <div class="text-lg font-black text-[#1E3A8A]" x-text="Number(tire.price).toLocaleString('ru-RU') + ' ₸'"></div>
+                                <div class="text-[9px] font-bold" :class="tire.stock.includes('больше') ? 'text-green-600' : 'text-orange-500'" x-text="'Склад: ' + tire.stock"></div>
                             </div>
-                            
                             <a :href="'https://wa.me/77001234567?text=Интересуюсь: ' + tire.name + ' (' + tire.size + ')'" 
-                               class="bg-[#2563EB] text-white p-3.5 rounded-xl shadow-lg shadow-blue-100 hover:scale-110 transition-transform">
+                               class="bg-[#22C55E] text-white p-2.5 rounded-xl shadow-lg active:scale-90 transition-transform">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412 0 6.556-5.338 11.891-11.893 11.891-2.01 0-3.987-.51-5.742-1.47l-6.155 1.679zm6.216-3.758c1.616.959 3.23 1.442 4.848 1.442 5.397 0 9.789-4.392 9.789-9.789s-4.392-9.789-9.789-9.789c-5.399 0-9.791 4.392-9.791 9.791 0 1.769.469 3.5 1.357 5.011l-1.03 3.764 3.828-1.026zm9.462-6.516c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
                             </a>
                         </div>
@@ -142,40 +106,39 @@ function tireCatalog() {
     return {
         tires: [],
         loading: true,
+        search: '',
         filters: { season: 'Все', brand: '', size: '', spike: 'Все' },
         options: { seasons: [], brands: [], sizes: [] },
         csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRllTq080YSSI7EgOmGa0XqlhLPxKpomN26jhacDriuVsYPMdJhLM1blqR5Z5FiBvUOjHrdQujXS67q/pub?output=csv',
 
-        async init() {
+        init() {
             Papa.parse(this.csvUrl, {
                 download: true,
                 header: true,
-                skipEmptyLines: true,
                 complete: (results) => {
                     this.tires = results.data
-                        .filter(row => row['Наименование'] && String(row['Остаток']).trim() !== '0')
-                        .map((row, i) => {
-                            // Ищем цену в колонке "РОЗНИЦА" (желтая колонка J на скриншоте)
-                            // Очищаем от всех символов кроме цифр
-                            let rawPrice = row['РОЗНИЦА'] || 0;
-                            let cleanPrice = String(rawPrice).replace(/[^0-9]/g, '');
-                            
-                            return {
-                                id: i,
-                                name: row['Наименование'],
-                                brand: row['Бренд'],
-                                price: parseInt(cleanPrice) || 0,
-                                size: row['Размер'],
-                                stock: row['Остаток'],
-                                photo: row['Фото'],
-                                type: row['Тип'],
-                                spike: row['Шипы']
-                            };
-                        });
+                        .filter(row => {
+                            const hasName = !!row['Наименование'];
+                            const stock = String(row['Остаток']).trim();
+                            const isAvailable = stock !== '0' && stock !== '';
+                            return hasName && isAvailable;
+                        })
+                        .map((row, i) => ({
+                            id: i,
+                            name: row['Наименование'],
+                            brand: row['Бренд'],
+                            // Преобразуем цену в число для корректной сортировки
+                            price: parseFloat(String(row['РОЗНИЦА']).replace(/[^0-9.]/g, '')),
+                            size: row['Размер'],
+                            stock: row['Остаток'],
+                            photo: row['Фото'],
+                            type: row['Тип'],
+                            spike: row['Шипы']
+                        }));
                     
-                    this.options.seasons = [...new Set(this.tires.map(t => t.type))].filter(Boolean).sort();
-                    this.options.brands = [...new Set(this.tires.map(t => t.brand))].filter(Boolean).sort();
-                    this.options.sizes = [...new Set(this.tires.map(t => t.size))].filter(Boolean).sort();
+                    this.options.seasons = [...new Set(this.tires.map(t => t.type))].filter(x => x).sort();
+                    this.options.brands = [...new Set(this.tires.map(t => t.brand))].filter(x => x).sort();
+                    this.options.sizes = [...new Set(this.tires.map(t => t.size))].filter(x => x).sort();
                     this.loading = false;
                 }
             });
@@ -183,21 +146,25 @@ function tireCatalog() {
 
         resetFilters() {
             this.filters = { season: 'Все', brand: '', size: '', spike: 'Все' };
+            this.search = '';
         },
 
         isFiltered() {
-            return this.filters.season !== 'Все' || this.filters.brand || this.filters.size || this.filters.spike !== 'Все';
+            return this.search || this.filters.season !== 'Все' || this.filters.brand || this.filters.size || this.filters.spike !== 'Все';
         },
 
         filteredTires() {
             let filtered = this.tires.filter(t => {
+                const s = this.search.toLowerCase();
+                const matchSearch = t.name.toLowerCase().includes(s) || t.brand.toLowerCase().includes(s);
                 const matchSeason = this.filters.season === 'Все' || t.type === this.filters.season;
                 const matchSpike = this.filters.spike === 'Все' || t.spike === this.filters.spike;
                 const matchBrand = !this.filters.brand || t.brand.toLowerCase().includes(this.filters.brand.toLowerCase());
                 const matchSize = !this.filters.size || t.size.toLowerCase().includes(this.filters.size.toLowerCase());
-                return matchSeason && matchBrand && matchSize && matchSpike;
+                return matchSearch && matchSeason && matchBrand && matchSize && matchSpike;
             });
-            // Сортировка от дешевых к дорогим
+
+            // Сортировка по возрастанию цены
             return filtered.sort((a, b) => a.price - b.price);
         }
     }
